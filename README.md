@@ -51,7 +51,41 @@ That solution, or at least my implementation of it, can be found in this reposit
 This repository contains the PCB design (both editable files and print-ready Gerber), the hardware list of parts required, and the Arduino code needed to build the control module. 
 
 ## Parts List
-TODO
+### Dash-cam Only
+* [BlackVue B-130X](https://www.blackvue.com.au/accessories/blackvue-b-130x/)
+  * Can substitute this for a different battery pack which is capable of charging at alternator voltage and outputs both 12V and 5V.
+  * You may be tempted, as I was, to just wire a second 12V battery straight in here. But there are some issues with that:
+    * You can't just wire a 12V lithium battery to your cars accessory circuit. You'll probably blow it up. Lihium batteries require a specific charging circuit which is different from the lead-acid optimized versions used in most cars.
+    * You **can** wire in another lead acid battery to your car (ideally a deep cycle one for this use case) but there are considerations to take. For example, you can't just wire it into the cabin using a fuse-tap as the amount of current it will pull while charging will likely blow the fuse. Also you don't want it in the cabin anyway as those things can leak fumes while charging. Finally, you need to be careful just wiring a battery in parallel with your cars accessory power as (while it will charge when the car is on) it will also push power back into the car when you turn the car off, leaving accessories powered in the car as possibly causing damage.
+  * All of the above is why, though it's more expensive than just a 7Ah Deep Cycle battery, I went with something off the shelf.
+* The PCB itself. You'll find the Gerber files in this repo. Just place an order with JLCPCB or PCBWay and have them manufacture it for you. Default settings are fine.
+* 1x [EzSBC ESP32](https://ezsbc.shop/products/esp32-breakout-and-development-board)
+  * Other ESP32 units will work from a software standpoint. But the PCB is designed to fit one of these units specifically. I recommend them as they are well made, they offer good after-sales support and they have the lowest deep-sleep current of any ESP32 I've found.
+* 1x [HFD2/005-M-L2](https://www.ebay.com/itm/126486144962))
+  * I just got mine off EBay. Knock-offs but they work.
+  * HFD2 is the component ID. Not interchangable here.
+  * 005 indicates it's the version operated off 5V control (as opposed to the "012" 12V version etc). Not interchangable here.
+  * M indicates it's the standard sensitivity version. The "S" sensitive version will likely work here too as a substitute.
+  * L2 indicates it's two coil control rather than a single coil with reverse polarity. Not interchangable here.
+* 1x [JD1914 Relay](https://www.ebay.com/itm/235041567706)
+  * Again, I went EBay here.
+  * Harness not required, the board is designed to accept it directly.
+  * Any automotive relay that fits the footprint works. Automotive ideally as the coil here is controlled from the cars accessory power so will need to handle the associated voltage range.
+* 2x [2N2222 Transistor](https://www.ebay.com/itm/123551520883)
+* 3x [1N4007 Diode](https://www.ebay.com/itm/304657829012)
+* 3x [10k Resistor](https://www.ebay.com/itm/255227417575)
+* 2x [1k Resistor](https://www.ebay.com/itm/255227383471)
+* 2x [JST-VH 3.96mm Pitch 2-Pin Connector](https://www.ebay.com/itm/204070036118)
+* 1x [JST-VH 3.96mm Pitch 4-Pin Connector](https://www.ebay.com/itm/204070036234)
+* 1x [JST-VH 3.96mm Pitch 4-Pin Connector](https://www.ebay.com/itm/363949222192)
+
+### Add GPS Tracker
+Dash-cam items listed above, plus:
+ * 1x [JST-VH 3.96mm Pitch 2-Pin Connector](https://www.ebay.com/itm/204070036118)
+   
+### Add 4G Wi-Fi
+Dash-cam items listed above, plus:
+ * 1x [JST-VH 3.96mm Pitch 2-Pin Connector](https://www.ebay.com/itm/204070036118)
 
 ## Code Modifications
 TODO
@@ -72,4 +106,5 @@ Feel free to use, edit, and share this work. That's why I uploaded it, in the ho
 * **Commercialization**: I developed this as a labor of love. It seems far too niche a thing to have any sort of commercial value. However, in the unlikely event that I'm wrong there please know that this isn't free real-estate. Don't go mass-producing this and selling it off as a side hustle. If you think there's value in it as a commercial product, then reach out. I would love to work with you properly.
 
 TODO:
-* Update the PCB to include a third pin for the dash-cam's accessory power sense pin so it's able to determine whether to go into parking mode or not.
+* Update the PCB to include a third (fourth??) pin for the dash-cam's accessory power sense pin so it's able to determine whether to go into parking mode or not.
+* TODO: Update ReadMe parts list to include wires, USB headers etc. etc.
