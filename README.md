@@ -75,23 +75,32 @@ This repository contains the PCB design (both editable files and print-ready Ger
 * 3x [1N4007 Diode](https://www.ebay.com/itm/304657829012)
 * 3x [10k Resistor](https://www.ebay.com/itm/255227417575)
 * 2x [1k Resistor](https://www.ebay.com/itm/255227383471)
+* 1x [JST-VH 3.96mm Pitch 8-Pin Connector](https://www.ebay.com/itm/363949222192)
 * 2x [JST-VH 3.96mm Pitch 2-Pin Connector](https://www.ebay.com/itm/204070036118)
-* 1x [JST-VH 3.96mm Pitch 4-Pin Connector](https://www.ebay.com/itm/204070036234)
-* 1x [JST-VH 3.96mm Pitch 4-Pin Connector](https://www.ebay.com/itm/363949222192)
+* 1x [JST-VH 3.96mm Pitch 3-Pin Connector](https://www.ebay.com/itm/363948017305)
 
 ### Add GPS Tracker
 Dash-cam items listed above, plus:
- * 1x [JST-VH 3.96mm Pitch 2-Pin Connector](https://www.ebay.com/itm/204070036118)
+ * 1x [JST-VH 3.96mm Pitch 3-Pin Connector](https://www.ebay.com/itm/363948017305)
+ * 1x 12V 4G Tracker of your choice. Personally I went with the [Miktrack MT600](https://shop.mictrack.com/product/4g-vehicle-gps-tracker-mt600/) and have no complaints.
    
 ### Add 4G Wi-Fi
 Dash-cam items listed above, plus:
  * 1x [JST-VH 3.96mm Pitch 2-Pin Connector](https://www.ebay.com/itm/204070036118)
+ * 1x Sacrifical USB extension cable, or any cable with a female USB-A connector.
+ * 1x 5V 4G Wi-Fi dongle of your choice. Personally I went with the [Huawei E8372](https://consumer.huawei.com/in/routers/e8372/) and it works well enough.
 
 ## Code Modifications
-TODO
+All the code for this project is written in Arduino code for the ESP32 and uploaded to this repository. Feel free to make modifications and improvements, I would ask you raise a PR to have them pulled back into this repo for everyones benefit.
+
+Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
 
 ## PCB Modifications
-TODO
+The PCB was designed using the Standard Edition of [EasyEDA](https://easyeda.com). Other software exists such as the open source KiCad and the commercial software EAGLE.
+
+After giving each of these a try, I found EasyEDA had the softest learning curve for both myself and anyone wanting to make modifications, as well as the virtue of offering an in-browser editor thereby making it even more accessible.
+
+Either way, feel free to import and modify using a software of your preferance and (as always) consider contributing back any improvements you may come up with.
 
 ## Vehicle Installation
 TODO
@@ -104,7 +113,3 @@ Feel free to use, edit, and share this work. That's why I uploaded it, in the ho
 * **Changes**: consider raising a PR to this repository with any proposed improvements so other people may benefit as you have.
 * **Sharing**: please don't claim this work as your own. Ideally link back to this repository as, not only will that assign correct credit, but it also means future finders of your links will have the most recent version.
 * **Commercialization**: I developed this as a labor of love. It seems far too niche a thing to have any sort of commercial value. However, in the unlikely event that I'm wrong there please know that this isn't free real-estate. Don't go mass-producing this and selling it off as a side hustle. If you think there's value in it as a commercial product, then reach out. I would love to work with you properly.
-
-TODO:
-* Update the PCB to include a third (fourth??) pin for the dash-cam's accessory power sense pin so it's able to determine whether to go into parking mode or not.
-* TODO: Update ReadMe parts list to include wires, USB headers etc. etc.
