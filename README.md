@@ -93,7 +93,7 @@ Dash-cam items listed above, plus:
 ## Code Modifications
 All the code for this project is written in Arduino code for the ESP32 and uploaded to this repository. Feel free to make modifications and improvements, I would ask you raise a PR to have them pulled back into this repo for everyones benefit.
 
-Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
+Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file `arduino_secrets.h`. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
 
 ## PCB Modifications
 The PCB was designed using the Standard Edition of [EasyEDA](https://easyeda.com). Other software exists such as the open source KiCad and the commercial software EAGLE.

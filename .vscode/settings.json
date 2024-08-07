@@ -1,4 +1,7 @@
 {
     "arduino.useArduinoCli": true,
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": {
+        "*.h-sample": "c"
+    }
 }
