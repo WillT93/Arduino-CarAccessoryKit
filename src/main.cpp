@@ -1,5 +1,5 @@
 /*
-Arduino-CarAccessoryKit.ino
+Arduino-CarAccessoryKit
 
 William Taylor - 28/07/2024
 
@@ -10,15 +10,21 @@ Manages state of latching relay based on conditions such as:
 Designed with battery as intended power source so focus on energy conservation.
 */
 
+#include <Arduino.h>
 #include <WiFi.h>
+
 #include "arduino_secrets.h"
 
-// Constants
+// Constants:
 const int SCAN_LIMIT = 30;  // The number of times the unit should search for the
                             // home network before giving up, leaving the dashcam
                             // active and entering a deep sleep state.
 const int SCAN_INTERVAL = 5;  // The time to wait between scanning attempts.
                               // Unit is in seconds.
+
+
+// Function Declarations:
+bool isHomeWiFiDetected();
 
 void setup() {
   // Serial configuration
@@ -39,6 +45,7 @@ void loop() {
   Serial.println("Found!");
 }
 
+// Function Definitions:
 bool isHomeWiFiDetected() {
   Serial.println("WiFi scan starting");
 
