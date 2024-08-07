@@ -41,8 +41,11 @@ void setup() {
 }
 
 void loop() {
-  isHomeWiFiDetected();
-  Serial.println("Found!");
+  // Check if the vehicle is at home.
+  bool isHome = isHomeWiFiDetected();
+  if (isHome) {
+    // TODO
+  }
 }
 
 // Function Definitions:
@@ -51,7 +54,7 @@ bool isHomeWiFiDetected() {
 
   bool homeNetworkFound = false;
 
-  for (int scanAttempt = 0; scanAttempt < SCAN_LIMIT; scanAttempt++) {
+  for (int scanAttempt = 1; scanAttempt <= SCAN_LIMIT; scanAttempt++) {
     // WiFi.scanNetworks will return the number of networks found.
     int networkCount = WiFi.scanNetworks();
 
@@ -69,14 +72,12 @@ bool isHomeWiFiDetected() {
         if (WiFi.SSID(i) == SECRET_WIFI_SSID) {
           homeNetworkFound = true;
           // Breaks from "i" loop.
-          Serial.println("breaking 1");
           break;
         }
       }
     }
 
     if (homeNetworkFound) {
-      Serial.println("breaking 2");
       // Breaks from "scan" loop.
       break;
     } else {
@@ -87,7 +88,6 @@ bool isHomeWiFiDetected() {
     }
 
     // Wait a bit before scanning again.
-    Serial.println("Predelay");
     delay(SCAN_INTERVAL * 1000);
   }
 
