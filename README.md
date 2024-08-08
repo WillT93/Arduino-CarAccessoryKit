@@ -97,9 +97,9 @@ Sensitive information such as Wi-Fi names and password etc are all stored in a s
 
 ## Development
 If you want to modify or contribute to the project, this is the place to start.
-[PCB](PCB)
-[Code](CODE.md)
-[Installation](Installation)
+* [PCB](PCB). For anything related to the PDB board itself, or its component list.
+* [Code](Code). For anything related to the Arduino code running on the ESP32.
+* [Installation](Installation). For anything related to the installation of the finished product.
 
 ## Vehicle Installation
 TODO
