@@ -90,24 +90,14 @@ Dash-cam items listed above, plus:
  * 1x Sacrifical USB extension cable, or any cable with a female USB-A connector.
  * 1x 5V 4G Wi-Fi dongle of your choice. Personally I went with the [Huawei E8372](https://consumer.huawei.com/in/routers/e8372/) and it works well enough.
 
-## Code Modifications
-All the code for this project is written in Arduino code for the ESP32 and uploaded to this repository. Feel free to make modifications and improvements, I would ask you raise a PR to have them pulled back into this repo for everyones benefit.
-
-Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file `arduino_secrets.h`. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
-
 ## Development
 If you want to modify or contribute to the project, this is the place to start.
 * [PCB](PCB) - for anything related to the PDB board itself, or its component list.
 * [Code](Code) - for anything related to the Arduino code running on the ESP32.
 * [Installation](Installation) - for anything related to the installation of the finished product.
-* [Consumer](CONSUMER.md) - for use of the installed product.
+* [Operation](Docs/OPERATION.md) - for use of the installed product.
 
-## Vehicle Installation
-TODO
-
-## Bluetooth Control
-TODO
-
+## Use and Distribution
 Feel free to use, edit, and share this work. That's why I uploaded it, in the hopes it will solve for other people the same problem it solved for me. \
 **However** I would ask the following:
 * **Changes**: consider raising a PR to this repository with any proposed improvements so other people may benefit as you have.
