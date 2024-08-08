@@ -95,12 +95,11 @@ All the code for this project is written in Arduino code for the ESP32 and uploa
 
 Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file `arduino_secrets.h`. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
 
-## PCB Modifications
-The PCB was designed using the Standard Edition of [EasyEDA](https://easyeda.com). Other software exists such as the open source KiCad and the commercial software EAGLE.
-
-After giving each of these a try, I found EasyEDA had the softest learning curve for both myself and anyone wanting to make modifications, as well as the virtue of offering an in-browser editor thereby making it even more accessible.
-
-Either way, feel free to import and modify using a software of your preferance and (as always) consider contributing back any improvements you may come up with.
+## Development
+If you want to modify or contribute to the project, this is the place to start.
+[PCB](PCB)
+[Code](CODE.md)
+[Installation](Installation)
 
 ## Vehicle Installation
 TODO
