@@ -100,6 +100,7 @@ If you want to modify or contribute to the project, this is the place to start.
 * [PCB](PCB) - for anything related to the PDB board itself, or its component list.
 * [Code](Code) - for anything related to the Arduino code running on the ESP32.
 * [Installation](Installation) - for anything related to the installation of the finished product.
+* [Consumer](CONSUMER.md) - for use of the installed product.
 
 ## Vehicle Installation
 TODO
