@@ -23,10 +23,10 @@ Rather than hosting the server within ones own network, and thus punching a hole
 
 ## Guides
 Follow these in the order specified below.
-1) [INSTALL](INSTALL.md) - for the installation of the software within the VM.
-2) [FIREWALL](FIREWALL.md) - for the configuration of the firewall both on the cloud provider and within the VM.
-3) [OPTIMIZE](OPTIMIZE.md) - for the optimization required to ensure the VM doesn't crash within a few days.
-4) [ACCESS](ACCESS.md) - for instructions on accessing Traccar Web UI.
+1) [Install](INSTALL.md) - for the installation of the software within the VM.
+2) [Firewall](FIREWALL.md) - for the configuration of the firewall both on the cloud provider and within the VM.
+3) [Optimize](OPTIMIZE.md) - for the optimization required to ensure the VM doesn't crash within a few days.
+4) [Access](ACCESS.md) - for instructions on accessing Traccar Web UI.
 
 ## Useful resources
 These resources are the source of much of the processes and fixes documented above. Refer to them for further information and to give credit to the original authors.
