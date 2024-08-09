@@ -5,8 +5,8 @@ The tracking component actually has very little dependance on this project itsel
 If the tracking functionality is all that you are after, there is no requirement to explore the rest of the repository, however, this README article may still provide value. It offers a recommendation for specific off the shelf hardware and open source software, as well as detailed instructions around setting these both up.
 
 ## Guides
-* [SERVER](SERVER.md) - for instructions on setting up and configuring the server software
-* [HARDWARE](HARDWARE.md) - for hardware recommendation, installation and configuration
+* [Server](SERVER.md) - for instructions on setting up and configuring the server software
+* [Hardware](HARDWARE.md) - for hardware recommendation, installation and configuration
 
 Once the server has been configured, the hardware acquired and the necissary configurations applied to link the two. You should be able to access the Traccar Web UI at any time to monitor the location of the vehicle.
 
