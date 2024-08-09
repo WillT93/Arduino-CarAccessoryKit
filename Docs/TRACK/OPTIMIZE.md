@@ -5,5 +5,5 @@ As such, additional steps are recommended to optimize performance and provide so
 
 There are two layers to this. The first is to provide a swap area on your VM for it to offload memory contents to when needed. The second is to disable the performance schema of the SQL database running alongside Traccar.
 
-1) [SWAP](SWAP.md) - for adding swap to your VM.
+1) [Swap](SWAP.md) - for adding swap to your VM.
 2) [SQL](SQL.md) - for disabling the SQL performance schema.
