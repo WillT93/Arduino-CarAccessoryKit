@@ -17,6 +17,8 @@ If you want to modify or contribute to the project, this is the place to start.
 
 * [Code](Code) - for anything related to the Arduino code running on the ESP32.
 
+* [Tracking](Docs/TRACK) - for anything related to the GPS tracking accessory aspect.
+
 * [Installation](Installation) - for anything related to the installation of the finished product.
 
 * [Operation](Docs/OPERATION.md) - for use of the installed product.
