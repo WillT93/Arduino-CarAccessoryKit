@@ -34,7 +34,7 @@ These resources are the source of much of the processes and fixes documented abo
   * [VPS Installation](https://www.traccar.org/install-digitalocean/)
 * Firewalling:
   * [OCI & VM](https://blogs.oracle.com/developers/post/enabling-network-traffic-to-ubuntu-images-in-oracle-cloud-infrastructure)
-  * [OCI (With images)](https://oracle-base.com/articles/vm/oracle-cloud-infrastructure-oci-amend-firewall-rules)
+  * [OCI (with images)](https://oracle-base.com/articles/vm/oracle-cloud-infrastructure-oci-amend-firewall-rules)
 * Optimization:
   * [Swap File](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04)
   * [SQL]()
