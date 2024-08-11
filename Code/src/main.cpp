@@ -34,6 +34,10 @@ const int PIN_WAKE_STATE = HIGH;  // The state the WAKE_UP_PIN needs
 bool isHomeWiFiDetected();
 bool isVehicleRunning();
 
+// Setup routine.
+// Run each time the ESP is powered up, including waking from deep sleep.
+// Essentially this will execute once, each time the car is started.
+// Configures WiFi and Deep Sleep, and activates dash-cam for driving.
 void setup() {
   // Serial configuration
   Serial.begin(115200);
