@@ -1,7 +1,7 @@
 # Installation
 This process has been tested on both Google Cloud and Oracle Cloud Infrastructure (OCI). Both providers offer a free tier with sufficient resources to provision a Traccar Server VM. This guide was written during the OCI deployment, more specifically using an Ubuntu VM server, and so covers that provider and OS more specifically. Some sections will need to be adapted slightly should you choose to use another cloud service provider or operating system.
 
-This guide will not cover the process of registering for an account, nor provisioning the VM. These are processes that both change regularly, increasing the maintainance requirement of this guide. Plenty of resources exist out there instructing you on how to do both of these tasks with the provider of your choice.
+This guide will not cover the process of registering for an account, nor provisioning the VM. These are processes that both change regularly, increasing the maintenance  requirement of this guide. Plenty of resources exist out there instructing you on how to do both of these tasks with the provider of your choice.
 
 Return to this guide once your VPS (VM) is spun up on your cloud provider and you have SSH access to it.
 

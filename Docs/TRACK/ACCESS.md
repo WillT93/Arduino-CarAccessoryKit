@@ -1,7 +1,7 @@
 # Access
-With the VM stood up in your cloud provider of choice and appropriately firewalled and optimized it's time to access it for the first time. In the case of most cloud providers, a VM will be assigned a static IP (or something similar). 
+With the VM stood up in your cloud provider of choice and appropriately firewalled and optimized it's time to access it for the first time. In the case of most cloud providers, a VM will be assigned a static IP (or something similar).
 
-For Oracle, unless otherwise specified, a VM will receive a public IP which is static for the duration of its life. The IP will persist between reboots of the VM, however if the VM is ever removed entirely, the IP will be unassigned. This should never really present a problem for this purpose as the VM, once stood up, is unlikley to be torn down.
+For Oracle, unless otherwise specified, a VM will receive a public IP which is static for the duration of its life. The IP will persist between reboots of the VM, however if the VM is ever removed entirely, the IP will be unassigned. This should never really present a problem for this purpose as the VM, once stood up, is unlikely to be torn down.
 
 If desired, one can always purchase a domain name and create a DNS entry that points to this IP. That's optional and outside the scope of this guide, but feel free to look into it if desired. Cloudflare is a powerful and popular provider for these purposes.
 
