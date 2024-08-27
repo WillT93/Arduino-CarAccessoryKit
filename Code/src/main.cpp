@@ -13,22 +13,9 @@ Designed with battery as intended power source so focus on energy conservation.
 #include <Arduino.h>
 #include <WiFi.h>
 
-#include "arduino_secrets.h"
-
-// Constants:
-//// WiFi
-const int SCAN_LIMIT = 30;  // The number of times the unit should search for the
-                            // home network before giving up, leaving the dashcam
-                            // active and entering a deep sleep state.
-const int SCAN_INTERVAL = 5;  // The time to wait between scanning attempts.
-                              // Unit is in seconds.
-//// Deep Sleep
-const gpio_num_t WAKE_UP_PIN = GPIO_NUM_32; // The pin connected to the automotive relay
-                                            // which is brought high when the vehicle
-                                            // engine starts. Used to wake ESP32 from sleep.
-const int PIN_WAKE_STATE = HIGH;  // The state the WAKE_UP_PIN needs
-                                  // to be in, in order to wake the ESP32
-
+#include "constants.h"
+#include "enums.h"
+#include "secrets.h"
 
 // Function Declarations:
 bool isHomeWiFiDetected();
@@ -95,6 +82,10 @@ bool isHomeWiFiDetected() {
   bool homeNetworkFound = false;
 
   for (int scanAttempt = 1; scanAttempt <= SCAN_LIMIT; scanAttempt++) {
+    // Early exit from scan loop.
+    // If car is started again during scan period, we should exit the loop and leave dash-cam powered.
+
+
     // WiFi.scanNetworks will return the number of networks found.
     int networkCount = WiFi.scanNetworks();
 
