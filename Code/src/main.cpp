@@ -70,6 +70,7 @@ void loop() {
   if (isVehicleRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
     // Loop will be called again immediately.
+    Serial.println("Car running. No action to perform");
     delay(1000);
     return;
   }
@@ -117,6 +118,7 @@ bool isHomeWiFiDetected() {
     }
 
     if (homeNetworkFound) {
+      Serial.println("Home network found");
       // Breaks from "scan" loop.
       break;
     } else {
