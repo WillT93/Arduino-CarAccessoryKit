@@ -1,5 +1,5 @@
-#ifndef _SECRETS_h
-#define _SECRETS_h
+#ifndef _ENUMS_h
+#define _ENUMS_h
 
 enum WiFiScanResult {
   Home,
