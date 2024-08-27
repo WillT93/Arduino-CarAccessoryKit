@@ -8,9 +8,9 @@ The below components list is targeted towards the PCB revision that makes use of
 
   * You may be tempted, as I was, to just wire a second 12V battery straight in here. But there are some issues with that:
 
-  * You can't just wire a 12V lithium battery to your cars accessory circuit. You'll probably blow it up. Lithium batteries require a specific charging circuit which is different from the lead-acid optimized versions used in most cars.
+    * You can't just wire a 12V lithium battery to your cars accessory circuit. You'll probably blow it up. Lithium batteries require a specific charging circuit which is different from the lead-acid optimized versions used in most cars.
 
-  * You **can** wire in another lead acid battery to your car (ideally a deep cycle one for this use case) but there are considerations to take. For example, you can't just wire it into the cabin using a fuse-tap as the amount of current it will pull while charging will likely blow the fuse. Also you don't want it in the cabin anyway as those things can leak fumes while charging. Finally, you need to be careful just wiring a battery in parallel with your cars accessory power as (while it will charge when the car is on) it will also push power back into the car when you turn the car off, leaving accessories powered in the car as possibly causing damage.
+    * You **can** wire in another lead acid battery to your car (ideally a deep cycle one for this use case) but there are considerations to take. For example, you can't just wire it into the cabin using a fuse-tap as the amount of current it will pull while charging will likely blow the fuse. Also you don't want it in the cabin anyway as those things can leak fumes while charging. Finally, you need to be careful just wiring a battery in parallel with your cars accessory power as (while it will charge when the car is on) it will also push power back into the car when you turn the car off, leaving accessories powered in the car as possibly causing damage.
 
   * All of the above is why, though it's more expensive than just a 7Ah Deep Cycle battery, I went with something off the shelf.
 
