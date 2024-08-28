@@ -12,27 +12,15 @@ Designed with battery as intended power source so focus on energy conservation.
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <elapsedMillis.h>
 
-#include "arduino_secrets.h"
-
-// Constants:
-//// WiFi
-const int SCAN_LIMIT = 30;  // The number of times the unit should search for the
-                            // home network before giving up, leaving the dashcam
-                            // active and entering a deep sleep state.
-const int SCAN_INTERVAL = 5;  // The time to wait between scanning attempts.
-                              // Unit is in seconds.
-//// Deep Sleep
-const gpio_num_t WAKE_UP_PIN = GPIO_NUM_32; // The pin connected to the automotive relay
-                                            // which is brought high when the vehicle
-                                            // engine starts. Used to wake ESP32 from sleep.
-const int PIN_WAKE_STATE = HIGH;  // The state the WAKE_UP_PIN needs
-                                  // to be in, in order to wake the ESP32
-
+#include "constants.h"
+#include "enums.h"
+#include "secrets.h"
 
 // Function Declarations:
-bool isHomeWiFiDetected();
-bool isVehicleRunning();
+WiFiScanResult ScanForHomeWiFi();
+bool VehicleIsRunning();
 
 // Setup routine.
 // Run each time the ESP is powered up, including waking from deep sleep.
@@ -51,6 +39,7 @@ void setup() {
   Serial.println("WiFi setup complete");
 
   // Configure deep sleep to wake when pin brought high.
+  pinMode(WAKE_UP_PIN, INPUT);
   esp_sleep_enable_ext0_wakeup(WAKE_UP_PIN, PIN_WAKE_STATE);
   Serial.println("Deep sleep setup complete");
 
@@ -67,7 +56,7 @@ void setup() {
 // Once the car is turned off, it will determine the appropriate state
 // for the dash-cam power relay based on WiFi proximity and run mode.
 void loop() {
-  if (isVehicleRunning()) {
+  if (VehicleIsRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
     // Loop will be called again immediately.
     Serial.println("Car running. No action to perform");
@@ -77,21 +66,30 @@ void loop() {
 
   // Once vehicle has been stopped.
   // Check if the vehicle is at home.
-  if (isHomeWiFiDetected()) {
-    // TODO: Kill power to the dash-cam.
-    Serial.println("Dash-cam deactivated. Sleeping...");
-    esp_deep_sleep_start();
-  } else {
-    // Nothing to change, dash-cam should be left powered.
-    Serial.println("Dash-cam continuing. Sleeping...");
-    esp_deep_sleep_start();
+  switch (ScanForHomeWiFi()) {
+    case Home:
+      // TODO: Kill power to the dash-cam.
+      Serial.println("Dash-cam deactivated. Sleeping...");
+      esp_deep_sleep_start();
+      break;
+    case Away:
+      // Nothing to change, dash-cam should be left powered.
+      Serial.println("Dash-cam continuing. Sleeping...");
+      esp_deep_sleep_start();
+      break;
+    case Interrupted:
+      // Nothing to change, dash-cam should be left powered, ESP shouldn't sleep.
+      Serial.println("Dash-cam continuing. Sleeping...");
+      break;
   }
 }
 
 // Function Definitions:
-bool isHomeWiFiDetected() {
+WiFiScanResult ScanForHomeWiFi() {
   Serial.println("WiFi scan starting");
-
+  
+  elapsedMillis scanTimer;
+  unsigned int scanDelay = (SCAN_INTERVAL * 1000);
   bool homeNetworkFound = false;
 
   for (int scanAttempt = 1; scanAttempt <= SCAN_LIMIT; scanAttempt++) {
@@ -129,12 +127,19 @@ bool isHomeWiFiDetected() {
     }
 
     // Wait a bit before scanning again.
-    delay(SCAN_INTERVAL * 1000);
+    scanTimer = 0;
+    while (scanTimer <= scanDelay) {
+      // Early exit from scan loop.
+      // If car is started again during scan period, we should exit the loop and leave dash-cam powered.
+      if (VehicleIsRunning()) {
+        return Interrupted;
+      }
+    }
   }
 
-  return homeNetworkFound;
+  return homeNetworkFound ? Home : Away;
 }
 
-bool isVehicleRunning() {
+bool VehicleIsRunning() {
   return (digitalRead(WAKE_UP_PIN) == HIGH);
 }

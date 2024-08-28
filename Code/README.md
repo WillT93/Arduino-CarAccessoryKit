@@ -12,7 +12,7 @@ With the extension installed, click the new PlatformIO icon on the left toolbar,
 From there, you should be pretty much ready to go, the settings are preconfigured for a generic ESP32 so plug one into your system and head to the `src/main.cpp` file. In the top right of the window you'll see a tick icon to verify the sketch and next to it a drop down arrow which will give you the option to deploy.
 
 ## Deploying
-This section assumes you've got a means by which to deploy code to an ESP32. In which case you'll find what you need in the `src` directory of this folder. Before deploying, remember to update the `arduino_secrets.h` file to include the name of your WiFi.
+This section assumes you've got a means by which to deploy code to an ESP32. In which case you'll find what you need in the `src` directory of this folder. Before deploying, remember to update the `secrets.h` file to include the name of your WiFi.
 
 ## Sensitive Information
-Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file `arduino_secrets.h`. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
+Sensitive information such as Wi-Fi names and password etc are all stored in a secrets file `secrets.h`. This hasn't been uploaded for obvious reasons, but a sample file is present to show the formatting. Update as needed and remove the `-sample` suffix.
