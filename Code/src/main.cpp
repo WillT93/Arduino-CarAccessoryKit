@@ -18,8 +18,8 @@ Designed with battery as intended power source so focus on energy conservation.
 #include "secrets.h"
 
 // Function Declarations:
-bool isHomeWiFiDetected();
-bool isVehicleRunning();
+WiFiScanResult ScanForHomeWiFi();
+bool VehicleIsRunning();
 
 // Setup routine.
 // Run each time the ESP is powered up, including waking from deep sleep.
@@ -38,6 +38,7 @@ void setup() {
   Serial.println("WiFi setup complete");
 
   // Configure deep sleep to wake when pin brought high.
+  pinMode(WAKE_UP_PIN, INPUT);
   esp_sleep_enable_ext0_wakeup(WAKE_UP_PIN, PIN_WAKE_STATE);
   Serial.println("Deep sleep setup complete");
 
@@ -54,7 +55,8 @@ void setup() {
 // Once the car is turned off, it will determine the appropriate state
 // for the dash-cam power relay based on WiFi proximity and run mode.
 void loop() {
-  if (isVehicleRunning()) {
+  Serial.println("Waking");
+  if (VehicleIsRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
     // Loop will be called again immediately.
     Serial.println("Car running. No action to perform");
@@ -64,7 +66,7 @@ void loop() {
 
   // Once vehicle has been stopped.
   // Check if the vehicle is at home.
-  if (isHomeWiFiDetected()) {
+  if (ScanForHomeWiFi() == Home) {
     // TODO: Kill power to the dash-cam.
     Serial.println("Dash-cam deactivated. Sleeping...");
     esp_deep_sleep_start();
@@ -76,7 +78,7 @@ void loop() {
 }
 
 // Function Definitions:
-bool isHomeWiFiDetected() {
+WiFiScanResult ScanForHomeWiFi() {
   Serial.println("WiFi scan starting");
 
   bool homeNetworkFound = false;
@@ -84,7 +86,9 @@ bool isHomeWiFiDetected() {
   for (int scanAttempt = 1; scanAttempt <= SCAN_LIMIT; scanAttempt++) {
     // Early exit from scan loop.
     // If car is started again during scan period, we should exit the loop and leave dash-cam powered.
-
+    if (VehicleIsRunning()) {
+      return Interrupted;
+    }
 
     // WiFi.scanNetworks will return the number of networks found.
     int networkCount = WiFi.scanNetworks();
@@ -123,9 +127,9 @@ bool isHomeWiFiDetected() {
     delay(SCAN_INTERVAL * 1000);
   }
 
-  return homeNetworkFound;
+  return homeNetworkFound ? Home : Away;
 }
 
-bool isVehicleRunning() {
+bool VehicleIsRunning() {
   return (digitalRead(WAKE_UP_PIN) == HIGH);
 }
