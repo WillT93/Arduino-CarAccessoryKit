@@ -12,6 +12,7 @@ Designed with battery as intended power source so focus on energy conservation.
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <elapsedMillis.h>
 
 #include "constants.h"
 #include "enums.h"
@@ -55,7 +56,6 @@ void setup() {
 // Once the car is turned off, it will determine the appropriate state
 // for the dash-cam power relay based on WiFi proximity and run mode.
 void loop() {
-  Serial.println("Waking");
   if (VehicleIsRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
     // Loop will be called again immediately.
@@ -66,30 +66,33 @@ void loop() {
 
   // Once vehicle has been stopped.
   // Check if the vehicle is at home.
-  if (ScanForHomeWiFi() == Home) {
-    // TODO: Kill power to the dash-cam.
-    Serial.println("Dash-cam deactivated. Sleeping...");
-    esp_deep_sleep_start();
-  } else {
-    // Nothing to change, dash-cam should be left powered.
-    Serial.println("Dash-cam continuing. Sleeping...");
-    esp_deep_sleep_start();
+  switch (ScanForHomeWiFi()) {
+    case Home:
+      // TODO: Kill power to the dash-cam.
+      Serial.println("Dash-cam deactivated. Sleeping...");
+      esp_deep_sleep_start();
+      break;
+    case Away:
+      // Nothing to change, dash-cam should be left powered.
+      Serial.println("Dash-cam continuing. Sleeping...");
+      esp_deep_sleep_start();
+      break;
+    case Interrupted:
+      // Nothing to change, dash-cam should be left powered, ESP shouldn't sleep.
+      Serial.println("Dash-cam continuing. Sleeping...");
+      break;
   }
 }
 
 // Function Definitions:
 WiFiScanResult ScanForHomeWiFi() {
   Serial.println("WiFi scan starting");
-
+  
+  elapsedMillis scanTimer;
+  unsigned int scanDelay = (SCAN_INTERVAL * 1000);
   bool homeNetworkFound = false;
 
   for (int scanAttempt = 1; scanAttempt <= SCAN_LIMIT; scanAttempt++) {
-    // Early exit from scan loop.
-    // If car is started again during scan period, we should exit the loop and leave dash-cam powered.
-    if (VehicleIsRunning()) {
-      return Interrupted;
-    }
-
     // WiFi.scanNetworks will return the number of networks found.
     int networkCount = WiFi.scanNetworks();
 
@@ -124,7 +127,14 @@ WiFiScanResult ScanForHomeWiFi() {
     }
 
     // Wait a bit before scanning again.
-    delay(SCAN_INTERVAL * 1000);
+    scanTimer = 0;
+    while (scanTimer <= scanDelay) {
+      // Early exit from scan loop.
+      // If car is started again during scan period, we should exit the loop and leave dash-cam powered.
+      if (VehicleIsRunning()) {
+        return Interrupted;
+      }
+    }
   }
 
   return homeNetworkFound ? Home : Away;
