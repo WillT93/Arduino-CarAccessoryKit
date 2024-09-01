@@ -7,4 +7,10 @@ enum WiFiScanResult {
   Interrupted
 };
 
+enum DashCamParkedRunMode {
+  Auto, // TODO Document
+  On,
+  Off
+};
+
 #endif

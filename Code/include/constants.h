@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+// Config
+const DashCamParkedRunMode DC_P_RUN_MODE = Auto; // TODO Document & Load from EEPROM in startup.
+
 // WiFi
 const int SCAN_LIMIT = 30;  // The number of times the unit should search for the
                             // home network before giving up, leaving the dashcam
