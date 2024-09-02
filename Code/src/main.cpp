@@ -19,6 +19,7 @@
 #include <WiFi.h>
 #include <elapsedMillis.h>
 #include <EEPROM.h>
+#include <BluetoothSerial.h>
 
 #include "constants.h"
 #include "enums.h"
@@ -29,12 +30,17 @@ ParkingMode _parkingMode = Auto; // The mode the dash-cam will operate in when t
 OverrideParkingMode _overrideParkingMode = Undefined; // Temporary override mode for SingleOn and SingleOff.
 String _homeWiFiSSID = SECRET_WIFI_SSID;
 
+// Variables
+BluetoothSerial _serialBT;
+
 // Function Declarations:
 WiFiScanResult ScanForHomeWiFi();
 bool VehicleIsRunning();
 void InitializeEEPROM();
 void LoadConfigFromEEPROM();
 void SaveConfigToEEPROM();
+void BluetoothStatusChanged(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
+void HandleBluetoothCommunication();
 
 /*
 * Setup routine.
@@ -52,8 +58,14 @@ void setup() {
   DEBUG_SERIAL.begin(115200);
   DEBUG_SERIAL.println("Setup starting");
 
+  // Bluetooth serial configuration
+  _serialBT.register_callback(BluetoothStatusChanged);
+  _serialBT.begin(SECRET_BLUETOOTH_NAME);
+  DEBUG_SERIAL.println("Bluetooth setup complete");
+
   // Load in configuration options from non-volatile memory.
   LoadConfigFromEEPROM();
+  DEBUG_SERIAL.println("Configuration loaded from EEPROM");
 
   // Set WiFi to station mode.
   WiFi.mode(WIFI_STA);
@@ -83,6 +95,10 @@ void setup() {
 */
 void loop() {
   if (EEPROM_INIT) return;
+
+  if (_serialBT.available()) {
+    HandleBluetoothCommunication();
+  }
 
   if (VehicleIsRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
@@ -180,6 +196,21 @@ bool VehicleIsRunning() {
 }
 
 /*
+* Callback function for when a bluetooth client connects or disconnects from the device.
+*/
+void BluetoothStatusChanged (esp_spp_cb_event_t event, esp_spp_cb_param_t *param) {
+
+  if (event == ESP_SPP_SRV_OPEN_EVT) {
+    DEBUG_SERIAL.println ("Bluetooth client connected");
+    _serialBT.println("Enter config PIN");
+  }
+
+  else if (event == ESP_SPP_CLOSE_EVT ) {
+    DEBUG_SERIAL.println ("Bluetooth client disconnected");
+  }
+}
+
+/*
 * Pulls configuration from EEPROM on ESP startup and reads them into the global variables.
 */
 void LoadConfigFromEEPROM() {
@@ -205,4 +236,48 @@ void InitializeEEPROM() {
     EEPROM.write(i, 0);
   };
   SaveConfigToEEPROM();
+}
+
+/*
+* Called when configuration is being applied over Bluetooth.
+* Validates with PIN, applies config to global variables and saves to EEPROM.
+*/
+// TODO: Look into this method again. Is it blocking? Is it too nested? Can it be broken down?
+void HandleBluetoothCommunication() {
+  
+  // Checks if the whole PIN has been received.
+  if (_serialBT.available() == SECRET_CONFIG_PIN_LENGTH) {
+    String inputPin = _serialBT.readString();
+
+    // Validate PIN
+    if (!inputPin.equals(SECRET_CONFIG_PIN)) {
+      _serialBT.println("Incorrect PIN");
+      return;
+    }
+    else {
+      _serialBT.println("PIN accepted.");
+      _serialBT.println("Send W to configure home WiFi SSID.");
+      _serialBT.println("Send C to configure camera run mode.");
+      _serialBT.println("Send X to exit.");
+
+      while (true) {
+        if (_serialBT.available()) {
+          char input = _serialBT.read();
+          switch(input) {
+            case 'W':
+              // TODO: Wifi SSID Update
+              break;
+            case 'C':
+              // TODO: Camera Run Mode Update
+              break;
+            case 'X':
+              return;
+            default:
+              _serialBT.println("Invalid option. Enter again.");
+              break;
+          }
+        }
+      };
+    }
+  }
 }
