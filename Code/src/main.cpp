@@ -61,6 +61,7 @@ void setup() {
   // Bluetooth serial configuration
   _serialBT.register_callback(BluetoothStatusChanged);
   _serialBT.begin(SECRET_BLUETOOTH_NAME);
+  _serialBT.pin(SECRET_BT_PAIRING_PIN);
   DEBUG_SERIAL.println("Bluetooth setup complete");
 
   // Load in configuration options from non-volatile memory.
