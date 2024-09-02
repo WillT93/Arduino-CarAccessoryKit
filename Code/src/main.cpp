@@ -40,7 +40,9 @@ void InitializeEEPROM();
 void LoadConfigFromEEPROM();
 void SaveConfigToEEPROM();
 void BluetoothStatusChanged(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
-void HandleBluetoothCommunication();
+void HandleBluetoothComms();
+void HandleWiFiSSIDUpdate();
+void HandleCameraRunModeUpdate();
 
 /*
 * Setup routine.
@@ -56,35 +58,35 @@ void setup() {
 
   // Serial configuration
   DEBUG_SERIAL.begin(115200);
-  DEBUG_SERIAL.println("Setup starting");
+  DEBUG_SERIAL.println(F("Setup starting"));
 
   // Bluetooth serial configuration
   _serialBT.register_callback(BluetoothStatusChanged);
   _serialBT.begin(SECRET_BLUETOOTH_NAME);
-  _serialBT.pin(SECRET_BT_PAIRING_PIN);
-  DEBUG_SERIAL.println("Bluetooth setup complete");
+  _serialBT.setPin(SECRET_BLUETOOTH_PAIRING_PIN);
+  DEBUG_SERIAL.println(F("Bluetooth setup complete"));
 
   // Load in configuration options from non-volatile memory.
   LoadConfigFromEEPROM();
-  DEBUG_SERIAL.println("Configuration loaded from EEPROM");
+  DEBUG_SERIAL.println(F("Configuration loaded from EEPROM"));
 
   // Set WiFi to station mode.
   WiFi.mode(WIFI_STA);
   // Disconnect from an AP if it was previously connected.
   WiFi.disconnect();
   delay(100);
-  DEBUG_SERIAL.println("WiFi setup complete");
+  DEBUG_SERIAL.println(F("WiFi setup complete"));
 
   // Configure deep sleep to wake when pin brought high.
   pinMode(WAKE_UP_PIN, INPUT);
   esp_sleep_enable_ext0_wakeup(WAKE_UP_PIN, WAKE_UP_PIN_WAKE_STATE);
-  DEBUG_SERIAL.println("Deep sleep setup complete");
+  DEBUG_SERIAL.println(F("Deep sleep setup complete"));
 
   // Configure the relay to activate the dash-cam for driving mode.
   // TODO: Activate dash-cam relay here.
-  DEBUG_SERIAL.println("Relay config setup complete");
+  DEBUG_SERIAL.println(F("Relay config setup complete"));
 
-  DEBUG_SERIAL.println("Setup complete");
+  DEBUG_SERIAL.println(F("Setup complete"));
 }
 
 /*
@@ -97,14 +99,10 @@ void setup() {
 void loop() {
   if (EEPROM_INIT) return;
 
-  if (_serialBT.available()) {
-    HandleBluetoothCommunication();
-  }
-
   if (VehicleIsRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
     // Loop will be called again immediately.
-    DEBUG_SERIAL.println("Car running. No action to perform");
+    DEBUG_SERIAL.println(F("Car running. No action to perform"));
     delay(1000);
     return;
   }
@@ -114,17 +112,17 @@ void loop() {
   switch (ScanForHomeWiFi()) {
     case Home:
       // TODO: Kill power to the dash-cam.
-      DEBUG_SERIAL.println("Dash-cam deactivated. Sleeping...");
+      DEBUG_SERIAL.println(F("Dash-cam deactivated. Sleeping..."));
       esp_deep_sleep_start();
       break;
     case Away:
       // Nothing to change, dash-cam should be left powered.
-      DEBUG_SERIAL.println("Dash-cam continuing. Sleeping...");
+      DEBUG_SERIAL.println(F("Dash-cam continuing. Sleeping..."));
       esp_deep_sleep_start();
       break;
     case Interrupted:
       // Nothing to change, dash-cam should be left powered, ESP shouldn't sleep.
-      DEBUG_SERIAL.println("Dash-cam continuing. Not sleeping...");
+      DEBUG_SERIAL.println(F("Dash-cam continuing. Not sleeping..."));
       break;
   }
 }
@@ -135,7 +133,7 @@ void loop() {
 * Returns enum indicating if the network was found, not found, or scan was interrupted.
 */
 WiFiScanResult ScanForHomeWiFi() {
-  DEBUG_SERIAL.println("WiFi scan starting");
+  DEBUG_SERIAL.println(F("WiFi scan starting"));
   
   elapsedMillis scanTimer;
   unsigned int scanDelay = (WIFI_SCAN_INTERVAL * 1000);
@@ -147,14 +145,14 @@ WiFiScanResult ScanForHomeWiFi() {
 
     // If no networks were found, continue.
     if (networkCount == 0) {
-      DEBUG_SERIAL.println("No networks found. Scan attempt ");
+      DEBUG_SERIAL.println(F("No networks found. Scan attempt "));
       DEBUG_SERIAL.print(scanAttempt);
-      DEBUG_SERIAL.print("/");
+      DEBUG_SERIAL.print(F("/"));
       DEBUG_SERIAL.println(WIFI_SCAN_LIMIT);
     // Otherwise, check if one of the networks in range was the home network.
     } else {
       DEBUG_SERIAL.print(networkCount);
-      DEBUG_SERIAL.println(" networks found");
+      DEBUG_SERIAL.println(F(" networks found"));
       for (int i = 0; i < networkCount; i++) {
         if (WiFi.SSID(i) == _homeWiFiSSID) {
           homeNetworkFound = true;
@@ -165,13 +163,13 @@ WiFiScanResult ScanForHomeWiFi() {
     }
 
     if (homeNetworkFound) {
-      DEBUG_SERIAL.println("Home network found");
+      DEBUG_SERIAL.println(F("Home network found"));
       // Breaks from "scan" loop.
       break;
     } else {
-      DEBUG_SERIAL.print("Home network not found. Scan attempt ");
+      DEBUG_SERIAL.print(F("Home network not found. Scan attempt "));
       DEBUG_SERIAL.print(scanAttempt);
-      DEBUG_SERIAL.print("/");
+      DEBUG_SERIAL.print(F("/"));
       DEBUG_SERIAL.println(WIFI_SCAN_LIMIT);
     }
 
@@ -200,14 +198,12 @@ bool VehicleIsRunning() {
 * Callback function for when a bluetooth client connects or disconnects from the device.
 */
 void BluetoothStatusChanged (esp_spp_cb_event_t event, esp_spp_cb_param_t *param) {
-
   if (event == ESP_SPP_SRV_OPEN_EVT) {
-    DEBUG_SERIAL.println ("Bluetooth client connected");
-    _serialBT.println("Enter config PIN");
+    DEBUG_SERIAL.println (F("Bluetooth client connected"));
+    HandleBluetoothComms();
   }
-
   else if (event == ESP_SPP_CLOSE_EVT ) {
-    DEBUG_SERIAL.println ("Bluetooth client disconnected");
+    DEBUG_SERIAL.println(F("Bluetooth client disconnected"));
   }
 }
 
@@ -243,42 +239,134 @@ void InitializeEEPROM() {
 * Called when configuration is being applied over Bluetooth.
 * Validates with PIN, applies config to global variables and saves to EEPROM.
 */
-// TODO: Look into this method again. Is it blocking? Is it too nested? Can it be broken down?
-void HandleBluetoothCommunication() {
-  
+void HandleBluetoothComms() {
+  _serialBT.print(F("Enter config PIN: "));
+
   // Checks if the whole PIN has been received.
-  if (_serialBT.available() == SECRET_CONFIG_PIN_LENGTH) {
-    String inputPin = _serialBT.readString();
+  if (_serialBT.available() < SECRET_CONFIG_PIN_LENGTH) return;
 
-    // Validate PIN
-    if (!inputPin.equals(SECRET_CONFIG_PIN)) {
-      _serialBT.println("Incorrect PIN");
-      return;
-    }
-    else {
-      _serialBT.println("PIN accepted.");
-      _serialBT.println("Send W to configure home WiFi SSID.");
-      _serialBT.println("Send C to configure camera run mode.");
-      _serialBT.println("Send X to exit.");
-
-      while (true) {
-        if (_serialBT.available()) {
-          char input = _serialBT.read();
-          switch(input) {
-            case 'W':
-              // TODO: Wifi SSID Update
-              break;
-            case 'C':
-              // TODO: Camera Run Mode Update
-              break;
-            case 'X':
-              return;
-            default:
-              _serialBT.println("Invalid option. Enter again.");
-              break;
-          }
-        }
-      };
-    }
+  // Validate PIN
+  String inputPin = _serialBT.readString();
+  if (!inputPin.equals(SECRET_CONFIG_PIN)) {
+    _serialBT.println(F("Incorrect PIN. Goodbye."));
+    return;
   }
+  
+  _serialBT.println(F("PIN accepted. Welcome."));
+  _serialBT.println(F("Send W to configure home WiFi SSID."));
+  _serialBT.println(F("Send C to configure camera run mode."));
+  _serialBT.println(F("Any other input to exit."));
+
+  // Wait for up to 20 seconds for an input to be sent from the user.
+  elapsedMillis timer = 0;
+  unsigned int timeToWaitForInput = (20 * 1000); // 20 Seconds
+  bool inputReceived = false;
+  while (timer <= timeToWaitForInput && !inputReceived) {
+    inputReceived = _serialBT.available();
+  }
+
+  // If nothing was entered in that time then return.
+  if (!inputReceived) {
+    _serialBT.println(F("No input received. Goodbye."));
+    return;
+  }
+
+  char input = _serialBT.read();
+  switch(input) {
+    case 'W':
+      HandleWiFiSSIDUpdate();
+      return;
+    case 'C':
+      HandleCameraRunModeUpdate();
+      return;
+    default:
+      _serialBT.println(F("Exit option received. Goodbye."));
+      return;
+  }
+}
+
+/*
+* Called by HandleBluetoothComms to manage update of WiFi SSID setting.
+* Stores setting to global variable and then EEPROM.
+*/
+void HandleWiFiSSIDUpdate() {
+  _serialBT.print(F("Enter the new home WiFi SSID: "));
+
+  // Wait for up to 20 seconds for an input to be sent from the user.
+  elapsedMillis timer = 0;
+  unsigned int timeToWaitForInput = (20 * 1000); // 20 Seconds
+  bool inputReceived = false;
+  while (timer <= timeToWaitForInput && !inputReceived) {
+    inputReceived = _serialBT.available();
+  }
+
+  // If nothing was entered in that time then return.
+  if (!inputReceived) {
+    _serialBT.println(F("No input received. Goodbye."));
+    return;
+  }
+
+  // Else save new SSID.
+  _homeWiFiSSID = _serialBT.readString();
+  SaveConfigToEEPROM();
+
+  _serialBT.println(F("New SSID saved. Goodbye."));
+}
+
+/*
+* Called by HandleBluetoothComms to manage update of dash-cam parking run mode setting.
+* Stores setting to global variable and then EEPROM.
+*/
+void HandleCameraRunModeUpdate() {
+  _serialBT.println(F("Enter the new run mode."));
+  _serialBT.println(F("Send A to configure Auto mode."));
+  _serialBT.println(F("Send N to configure On mode."));
+  _serialBT.println(F("Send F to configure Off mode."));
+  _serialBT.println(F("Send S to configure Single On mode."));
+  _serialBT.println(F("Send X to configure Single Off mode."));
+  _serialBT.println(F("Details about these modes can be found in the projects soure code."));
+  _serialBT.println(F("Any other input to exit."));
+
+  // Wait for up to 20 seconds for an input to be sent from the user.
+  elapsedMillis timer = 0;
+  unsigned int timeToWaitForInput = (20 * 1000); // 20 Seconds
+  bool inputReceived = false;
+  while (timer <= timeToWaitForInput && !inputReceived) {
+    inputReceived = _serialBT.available();
+  }
+
+  // If nothing was entered in that time then return.
+  if (!inputReceived) {
+    _serialBT.println(F("No input received. Goodbye."));
+    return;
+  }
+
+  // Else save new configuration.
+  char input = _serialBT.read();
+  switch(input) {
+    case 'A':
+      _parkingMode = Auto;
+      _overrideParkingMode = Undefined;
+      break;
+    case 'N':
+      _parkingMode = On;
+      _overrideParkingMode = Undefined;
+      break;
+    case 'F':
+      _parkingMode = Off;
+      _overrideParkingMode = Undefined;
+      break;
+    case 'S':
+      _overrideParkingMode = SingleOn;
+      break;
+    case 'X':
+    _overrideParkingMode = SingleOff;
+      break;
+    default:
+      _serialBT.println(F("Exit option received. Goodbye."));
+      return;
+  }
+
+  SaveConfigToEEPROM();
+  _serialBT.println(F("New config saved. Goodbye."));
 }
