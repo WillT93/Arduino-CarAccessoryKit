@@ -10,7 +10,9 @@
 * Designed with battery as intended power source so focus on energy conservation.
 */
 
-#define DEBUG true // Set to false to disable debug Serial logging
+#define EEPROM_INIT true // Set to true once to initialize the ESP EEPROM with default config.
+#define DEBUG true // Set to false to disable debug Serial logging.
+
 #define DEBUG_SERIAL if (DEBUG) Serial
 
 #include <Arduino.h>
@@ -30,6 +32,7 @@ String _homeWiFiSSID = SECRET_WIFI_SSID;
 // Function Declarations:
 WiFiScanResult ScanForHomeWiFi();
 bool VehicleIsRunning();
+void InitializeEEPROM();
 void LoadConfigFromEEPROM();
 void SaveConfigToEEPROM();
 
@@ -40,9 +43,17 @@ void SaveConfigToEEPROM();
 * Configures WiFi and Deep Sleep, and activates dash-cam for driving.
 */
 void setup() {
+  if (EEPROM_INIT) {
+    InitializeEEPROM();
+    return;
+  }
+
   // Serial configuration
   DEBUG_SERIAL.begin(115200);
   DEBUG_SERIAL.println("Setup starting");
+
+  // Load in configuration options from non-volatile memory.
+  LoadConfigFromEEPROM();
 
   // Set WiFi to station mode.
   WiFi.mode(WIFI_STA);
@@ -71,6 +82,8 @@ void setup() {
 * for the dash-cam power relay based on WiFi proximity and run mode.
 */
 void loop() {
+  if (EEPROM_INIT) return;
+
   if (VehicleIsRunning()) {
     // No action to perform while vehicle is running, wait briefly and return.
     // Loop will be called again immediately.
@@ -126,7 +139,7 @@ WiFiScanResult ScanForHomeWiFi() {
       DEBUG_SERIAL.print(networkCount);
       DEBUG_SERIAL.println(" networks found");
       for (int i = 0; i < networkCount; i++) {
-        if (WiFi.SSID(i) == SECRET_WIFI_SSID) {
+        if (WiFi.SSID(i) == _homeWiFiSSID) {
           homeNetworkFound = true;
           // Breaks from "i" loop.
           break;
@@ -182,4 +195,14 @@ void SaveConfigToEEPROM() {
   EEPROM.writeInt(EEPROM_PARKING_MODE_ADDRESS, _parkingMode);
   EEPROM.writeInt(EEPROM_PARKING_MODE_OVERRIDE_ADDRESS, _overrideParkingMode);
   EEPROM.writeString(EEPROM_PARKING_MODE_ADDRESS, _homeWiFiSSID);
+}
+
+/*
+* Initializes the EEPROM, sets all addresses to 0 and then loads in default config.
+*/
+void InitializeEEPROM() {
+  for (int i = 0; i < EEPROM.length(); i++) {
+    EEPROM.write(i, 0);
+  };
+  SaveConfigToEEPROM();
 }
