@@ -223,6 +223,7 @@ void SaveConfigToEEPROM() {
   EEPROM.writeInt(EEPROM_PARKING_MODE_ADDRESS, _parkingMode);
   EEPROM.writeInt(EEPROM_PARKING_MODE_OVERRIDE_ADDRESS, _overrideParkingMode);
   EEPROM.writeString(EEPROM_PARKING_MODE_ADDRESS, _homeWiFiSSID);
+  EEPROM.commit();
 }
 
 /*
