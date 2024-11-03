@@ -56,6 +56,8 @@ void setup() {
     return;
   }
 
+  EEPROM.begin(10);
+
   // Serial configuration
   DEBUG_SERIAL.begin(115200);
   DEBUG_SERIAL.println(F("Setup starting"));
